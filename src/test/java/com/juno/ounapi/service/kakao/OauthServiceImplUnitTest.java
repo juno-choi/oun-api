@@ -33,7 +33,8 @@ class OauthServiceImplUnitTest {
     void oauthTokenSuccess(){
         // given
         OauthRequest request = new OauthRequest("access_token", "bearer", "refresh_token", 21599L, "account_email profile_image profile_nickname", 5183999L);
-        given(myHttpClient.post(any())).willReturn(new HttpResponse<String>() {
+        given(myHttpClient.httpPostRequest(any()))
+                .willReturn(new HttpResponse<String>() {
             @Override
             public int statusCode() {
                 return 200;

@@ -2,9 +2,7 @@ package com.juno.ounapi.common.httpclient;
 
 import com.juno.ounapi.common.httpclient.vo.PostRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,13 +10,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@Configuration
 @Slf4j
-@ComponentScan(basePackages = {"com.juno.ounapi.common.httpclient.vo"})
+@Component
 public class MyHttpClient {
 
-    @Bean
-    public HttpResponse<String> post(PostRequest postRequest) {
+    public HttpResponse<String> httpPostRequest(PostRequest postRequest) {
         HttpResponse<String> response = null;
         HttpClient client = HttpClient.newBuilder()
                 .version(HttpClient.Version.HTTP_1_1)
