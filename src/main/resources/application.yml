@@ -21,6 +21,3 @@ logging:
   level:
     root: info
     com.juno.ounapi: debug
-# kakao
-kakao:
-  admin-key: ee9007502666d2cbbffe689c1faf459d

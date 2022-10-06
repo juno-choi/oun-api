@@ -4,6 +4,8 @@ import lombok.*;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class KakaoAccount {
     private String profile_nickname_needs_agreement;
     private String profile_image_needs_agreement;
@@ -13,7 +15,4 @@ public class KakaoAccount {
     private String is_email_valid;
     private String is_email_verified;
     private String email;
-
-    public KakaoAccount() {
-    }
 }

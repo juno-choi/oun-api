@@ -1,53 +1,48 @@
 package com.juno.ounapi.service.kakao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.juno.ounapi.common.httpclient.MyHttpClient;
+import com.juno.ounapi.common.httpclient.vo.PostRequest;
 import com.juno.ounapi.dto.kakao.user.KakaoResponse;
 import com.juno.ounapi.dto.kakao.OauthRequest;
 import com.juno.ounapi.vo.kakao.OauthResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+@RequiredArgsConstructor
 @Service
 @Slf4j
 public class OauthServiceImpl implements OauthService{
-    @Value("${kakao.admin-key}")
-    private String adminKey;
+    private final MyHttpClient myHttpClient;
 
     @Override
     public OauthResponse oauthToken(OauthRequest oauthRequest) {
-        log.debug("access token = {}", oauthRequest.getAccess_token());
+        log.debug("oauthToken call ...");
         KakaoResponse kakaoResponse = null;
-
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
+
         // 사용자 정보 가져오기
-        HttpClient client = HttpClient.newBuilder()
-                .version(HttpClient.Version.HTTP_1_1)
-                .build();
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://kapi.kakao.com/v2/user/me"))
-                .headers("Content-type", "application/x-www-form-urlencoded;charset=utf-8", "Authorization", String.format("Bearer %s", oauthRequest.getAccess_token()))
-                .POST(HttpRequest.BodyPublishers.ofString(""))
-                .build();
+        HttpResponse<String> response = myHttpClient.post(
+                PostRequest.builder()
+                        .uri("https://kapi.kakao.com/v2/user/me")
+                        .headers(new String[]{"Content-type", "application/x-www-form-urlencoded;charset=utf-8", "Authorization", String.format("Bearer %s", oauthRequest.getAccess_token())})
+                        .body("")
+                        .build()
+        );
 
         try {
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            log.debug("response body = {}", response.body());
             kakaoResponse = objectMapper.readValue(response.body(), KakaoResponse.class);
-            log.debug("response status = {}", response.statusCode());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
+        log.debug("response status = {}", response.statusCode());
 
         log.debug(kakaoResponse.getId().toString());
 
@@ -56,7 +51,11 @@ public class OauthServiceImpl implements OauthService{
         // db에 refresh_token 저장하기
 
         return OauthResponse.builder()
-                .name("test")
-                .build();
+                .nickname(kakaoResponse.getKakao_account()
+                        .getProfile()
+                        .getNickname()
+                ).build();
     }
+
+
 }
