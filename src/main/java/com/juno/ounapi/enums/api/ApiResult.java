@@ -5,6 +5,8 @@ import lombok.Getter;
 @Getter
 public enum ApiResult {
     SUCCESS("0000", "", "success"),
+    LOGIN_FAIL("0401", "ALERT", "아이디나 비밀번호를 확인해주세요."),
+    BAD_REQUEST("0400", "잘못된 요청", "fail"),
 
 
     ;
@@ -17,4 +19,5 @@ public enum ApiResult {
         this.resultType = resultType;
         this.resultMsg = resultMsg;
     }
+
 }

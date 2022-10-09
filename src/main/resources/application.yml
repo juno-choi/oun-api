@@ -22,7 +22,7 @@ spring:
   datasource:
     hikari:
       driver-class-name: org.h2.Driver
-      jdbc-url: jdbc:h2:mem:testdb
+      jdbc-url: jdbc:h2:mem:oun
       username: sa
       password:
   redis:
