@@ -17,9 +17,12 @@ import com.juno.ounapi.vo.kakao.EmptyResponse;
 import com.juno.ounapi.vo.kakao.OauthResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 @RequiredArgsConstructor
 @Service
@@ -27,6 +30,7 @@ import java.net.http.HttpResponse;
 public class OauthServiceImpl implements OauthService{
     private final MyHttpClient myHttpClient;
     private final MemberRepository memberRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public OauthResponse oauthToken(OauthRequest oauthRequest) {
@@ -36,8 +40,11 @@ public class OauthServiceImpl implements OauthService{
 
         KakaoResponse kakaoResponse = null;
         String accessToken = oauthRequest.getAccess_token();
-        String expiresIn = oauthRequest.getExpires_in().toString();
+        String accessTokenExpiresIn = oauthRequest.getExpires_in().toString();
+        String refreshToken = oauthRequest.getRefresh_token();
+        String refreshTokenExpiresIn = oauthRequest.getRefresh_token_expires_in().toString();
         String memberId = "";
+        String memberSeq = "";
 
         // 사용자 정보 가져오기
         HttpResponse<String> response = myHttpClient.httpPostRequest(
@@ -64,13 +71,22 @@ public class OauthServiceImpl implements OauthService{
         );
 
         // redis에 사용자 토큰 등록하기
+        memberSeq = String.valueOf(member.getId());
+        // redis에 사용자 토큰 등록하기
+        ValueOperations<String, Object> redis = redisTemplate.opsForValue();
+        // access token
+        redis.set(accessToken, memberSeq, Duration.ofMillis(Long.valueOf(accessTokenExpiresIn)));
+        // refresh token
+        redis.set(refreshToken, memberSeq, Duration.ofMillis(Long.valueOf(refreshTokenExpiresIn)));
 
         // db에 refresh_token 저장하기
 
         return OauthResponse.builder()
                 .nickname(member.getNickname())
                 .access_token(accessToken)
-                .access_token_expires(expiresIn)
+                .access_token_expires(accessTokenExpiresIn)
+                .refresh_token(refreshToken)
+                .refresh_token_expires(refreshTokenExpiresIn)
                 .email(member.getEmail())
                 .profile_img(member.getProfile())
                 .thumbnail_img(member.getThumbnail())
@@ -85,8 +101,11 @@ public class OauthServiceImpl implements OauthService{
 
         KakaoResponse kakaoResponse = null;
         String accessToken = oauthRequest.getAccess_token();
-        String expiresIn = oauthRequest.getExpires_in().toString();
+        String accessTokenExpiresIn = oauthRequest.getExpires_in().toString();
+        String refreshToken = oauthRequest.getRefresh_token();
+        String refreshTokenExpiresIn = oauthRequest.getRefresh_token_expires_in().toString();
         String memberId = "";
+        String memberSeq = "";
 
         // 사용자 정보 가져오기
         HttpResponse<String> response = myHttpClient.httpPostRequest(
@@ -120,15 +139,22 @@ public class OauthServiceImpl implements OauthService{
                 .build());
 
         log.debug("회원 가입 완료 = {}", member.getId());
-
+        memberSeq = String.valueOf(member.getId());
         // redis에 사용자 토큰 등록하기
+        ValueOperations<String, Object> redis = redisTemplate.opsForValue();
+        // access token
+        redis.set(accessToken, memberSeq, Duration.ofMillis(Long.valueOf(accessTokenExpiresIn)));
+        // refresh token
+        redis.set(refreshToken, memberSeq, Duration.ofMillis(Long.valueOf(refreshTokenExpiresIn)));
 
         // db에 refresh_token 저장하기
 
         return OauthResponse.builder()
                 .nickname(nickname)
                 .access_token(accessToken)
-                .access_token_expires(expiresIn)
+                .access_token_expires(accessTokenExpiresIn)
+                .refresh_token(refreshToken)
+                .refresh_token_expires(refreshTokenExpiresIn)
                 .email(email)
                 .profile_img(profile)
                 .thumbnail_img(thumbnail)

@@ -13,6 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import javax.net.ssl.SSLSession;
 import java.net.URI;
@@ -25,7 +27,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 
 @ExtendWith(MockitoExtension.class)
 class OauthServiceImplUnitTest {
@@ -37,6 +41,12 @@ class OauthServiceImplUnitTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private ValueOperations valueOperations;
 
     @Test
     @DisplayName("회원 조회에 실패한다.")
@@ -144,6 +154,8 @@ class OauthServiceImplUnitTest {
                 });
         Member member = new Member(1L, Oauth.KAKAO.name(), "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
         given(memberRepository.findByMemberId(any())).willReturn(Optional.of(member));
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        doNothing().when(valueOperations).set(anyString(), any(), any());
 
         // when
         OauthResponse oauthResponse = oauthService.oauthToken(request);
@@ -202,6 +214,8 @@ class OauthServiceImplUnitTest {
                 });
         Member member = new Member(1L, Oauth.KAKAO.name(), "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
         given(memberRepository.save(any())).willReturn(member);
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        doNothing().when(valueOperations).set(anyString(), any(), any());
 
         // when
         OauthResponse oauthResponse = oauthService.oauthJoin(request);

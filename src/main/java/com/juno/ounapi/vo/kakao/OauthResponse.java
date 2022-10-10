@@ -13,6 +13,8 @@ public class OauthResponse {
     private String nickname;
     private String access_token;
     private String access_token_expires;
+    private String refresh_token;
+    private String refresh_token_expires;
     private String profile_img;
     private String thumbnail_img;
     private String email;
