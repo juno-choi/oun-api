@@ -28,4 +28,14 @@ public class OauthController {
                         .build()
         );
     }
+
+    @PostMapping("/join")
+    public ResponseEntity<ApiResponse<?>> join(@RequestBody OauthRequest oauthRequest){
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .apiResult(ApiResult.SUCCESS)
+                        .data(oauthService.oauthJoin(oauthRequest))
+                        .build()
+        );
+    }
 }

@@ -5,4 +5,5 @@ import com.juno.ounapi.vo.kakao.OauthResponse;
 
 public interface OauthService {
     OauthResponse oauthToken(OauthRequest oauthRequest);
+    OauthResponse oauthJoin(OauthRequest oauthRequest);
 }
