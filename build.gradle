@@ -39,6 +39,9 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-data-redis')
 	// embedded-redis
 	implementation ('it.ozimov:embedded-redis:0.7.3') { exclude group: "org.slf4j", module: "slf4j-simple" }
+	// jwt
+	// https://mvnrepository.com/artifact/com.auth0/java-jwt
+	implementation 'com.auth0:java-jwt:4.0.0'
 }
 
 tasks.named('test') {
