@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.env.Environment;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,7 +33,6 @@ class TokenProviderTest {
         String accessToken = tokenProvider.createAccessToken(TokenDto.builder().id(1L).build());
         // then
         assertNotNull(accessToken);
-        System.out.println("access token =" + accessToken);
     }
 
 
@@ -46,7 +46,6 @@ class TokenProviderTest {
         String refreshToken = tokenProvider.createRefreshToken(TokenDto.builder().id(1L).build());
         // then
         assertNotNull(refreshToken);
-        System.out.println("refreshToken = " + refreshToken);
     }
 
     @Test
@@ -62,6 +61,24 @@ class TokenProviderTest {
         String parser = tokenProvider.parserSubject(accessToken);
         // then
         assertTrue(id == Long.valueOf(parser));
-        System.out.println("parser = " + parser);
+    }
+
+    @Test
+    @DisplayName("token expires parser 성공한다.")
+    void parserTokenExpiresSuccess() {
+        // given
+        Long id = 3L;
+        given(env.getProperty(eq("jwt.expires-in"))).willReturn("15");
+        given(env.getProperty(eq("jwt.access-secret"))).willReturn("access-secret");
+        String accessToken = tokenProvider.createAccessToken(TokenDto.builder().id(id).build());
+
+        // when
+        long expires = tokenProvider.parserExpiresAt(accessToken).getTime();
+        long now = System.currentTimeMillis();
+        // then
+
+        long remainTime = TimeUnit.MILLISECONDS.toMinutes(expires - now);
+        assertTrue(remainTime > 0);
+        assertTrue(remainTime <= 15);
     }
 }

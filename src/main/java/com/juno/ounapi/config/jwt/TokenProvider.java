@@ -41,4 +41,8 @@ public class TokenProvider {
     public String parserSubject(String token){
         return JWT.decode(token).getSubject();
     }
+
+    public Date parserExpiresAt(String token){
+        return JWT.decode(token).getExpiresAt();
+    }
 }

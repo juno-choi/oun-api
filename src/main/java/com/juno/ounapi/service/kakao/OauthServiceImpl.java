@@ -6,9 +6,11 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.juno.ounapi.common.Error;
 import com.juno.ounapi.common.httpclient.MyHttpClient;
 import com.juno.ounapi.common.httpclient.vo.PostRequest;
+import com.juno.ounapi.config.jwt.TokenProvider;
 import com.juno.ounapi.domain.member.Member;
 import com.juno.ounapi.dto.kakao.user.KakaoResponse;
 import com.juno.ounapi.dto.kakao.OauthRequest;
+import com.juno.ounapi.dto.token.TokenDto;
 import com.juno.ounapi.enums.api.CommonExceptionCode;
 import com.juno.ounapi.enums.oauth.Oauth;
 import com.juno.ounapi.exception.CommonException;
@@ -31,6 +33,7 @@ public class OauthServiceImpl implements OauthService{
     private final MyHttpClient myHttpClient;
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final TokenProvider tokenProvider;
 
     @Override
     public OauthResponse oauthToken(OauthRequest oauthRequest) {
@@ -39,18 +42,16 @@ public class OauthServiceImpl implements OauthService{
         objectMapper.registerModule(new JavaTimeModule());
 
         KakaoResponse kakaoResponse = null;
-        String accessToken = oauthRequest.getAccess_token();
-        String accessTokenExpiresIn = oauthRequest.getExpires_in().toString();
-        String refreshToken = oauthRequest.getRefresh_token();
-        String refreshTokenExpiresIn = oauthRequest.getRefresh_token_expires_in().toString();
+        String kakaoAccessToken = oauthRequest.getAccess_token();
+        String kakaoRefreshToken = oauthRequest.getRefresh_token();
+
         String memberId = "";
-        String memberSeq = "";
 
         // 사용자 정보 가져오기
         HttpResponse<String> response = myHttpClient.httpPostRequest(
                 PostRequest.builder()
                         .uri("https://kapi.kakao.com/v2/user/me")
-                        .headers(new String[]{"Content-type", "application/x-www-form-urlencoded;charset=utf-8", "Authorization", String.format("Bearer %s", accessToken)})
+                        .headers(new String[]{"Content-type", "application/x-www-form-urlencoded;charset=utf-8", "Authorization", String.format("Bearer %s", kakaoAccessToken)})
                         .body("")
                         .build()
         );
@@ -70,27 +71,8 @@ public class OauthServiceImpl implements OauthService{
                         .build())
         );
 
-        // redis에 사용자 토큰 등록하기
-        memberSeq = String.valueOf(member.getId());
-        // redis에 사용자 토큰 등록하기
-        ValueOperations<String, Object> redis = redisTemplate.opsForValue();
-        // access token
-        redis.set(accessToken, memberSeq, Duration.ofMillis(Long.valueOf(accessTokenExpiresIn)));
-        // refresh token
-        redis.set(refreshToken, memberSeq, Duration.ofMillis(Long.valueOf(refreshTokenExpiresIn)));
-
-        // db에 refresh_token 저장하기
-
-        return OauthResponse.builder()
-                .nickname(member.getNickname())
-                .access_token(accessToken)
-                .access_token_expires(accessTokenExpiresIn)
-                .refresh_token(refreshToken)
-                .refresh_token_expires(refreshTokenExpiresIn)
-                .email(member.getEmail())
-                .profile_img(member.getProfile())
-                .thumbnail_img(member.getThumbnail())
-                .build();
+        // token 생성
+        return getOauthResponse(kakaoAccessToken, kakaoRefreshToken, member);
     }
 
     @Override
@@ -100,18 +82,15 @@ public class OauthServiceImpl implements OauthService{
         objectMapper.registerModule(new JavaTimeModule());
 
         KakaoResponse kakaoResponse = null;
-        String accessToken = oauthRequest.getAccess_token();
-        String accessTokenExpiresIn = oauthRequest.getExpires_in().toString();
-        String refreshToken = oauthRequest.getRefresh_token();
-        String refreshTokenExpiresIn = oauthRequest.getRefresh_token_expires_in().toString();
+        String kakaoAccessToken = oauthRequest.getAccess_token();
+        String kakaoRefreshToken = oauthRequest.getRefresh_token();
         String memberId = "";
-        String memberSeq = "";
-
+        
         // 사용자 정보 가져오기
         HttpResponse<String> response = myHttpClient.httpPostRequest(
                 PostRequest.builder()
                         .uri("https://kapi.kakao.com/v2/user/me")
-                        .headers(new String[]{"Content-type", "application/x-www-form-urlencoded;charset=utf-8", "Authorization", String.format("Bearer %s", accessToken)})
+                        .headers(new String[]{"Content-type", "application/x-www-form-urlencoded;charset=utf-8", "Authorization", String.format("Bearer %s", kakaoAccessToken)})
                         .body("")
                         .build()
         );
@@ -139,27 +118,46 @@ public class OauthServiceImpl implements OauthService{
                 .build());
 
         log.debug("회원 가입 완료 = {}", member.getId());
-        memberSeq = String.valueOf(member.getId());
+
+
+        // token 생성
+        return getOauthResponse(kakaoAccessToken, kakaoRefreshToken, member);
+    }
+
+    private OauthResponse getOauthResponse(String kakaoAccessToken, String kakaoRefreshToken, Member member) {
+        
+        String accessToken = tokenProvider.createAccessToken(TokenDto.builder()
+                .id(member.getId())
+                .build());
+        String accessTokenExpiresIn = String.valueOf(tokenProvider.parserExpiresAt(accessToken)
+                .getTime());
+        // refresh
+        String refreshToken = tokenProvider.createRefreshToken(TokenDto.builder()
+                .id(member.getId())
+                .build());
+        String refreshTokenExpiresIn = String.valueOf(tokenProvider.parserExpiresAt(refreshToken)
+                .getTime());
+
+        log.debug("kakao access = {}, kakao refresh ={}", kakaoAccessToken, kakaoRefreshToken);
+        log.debug("oun access = {}, oun refresh ={}", accessToken, refreshToken);
+
         // redis에 사용자 토큰 등록하기
+        String memberSeq = String.valueOf(member.getId());
         ValueOperations<String, Object> redis = redisTemplate.opsForValue();
-        // access token
         redis.set(accessToken, memberSeq, Duration.ofMillis(Long.valueOf(accessTokenExpiresIn)));
-        // refresh token
         redis.set(refreshToken, memberSeq, Duration.ofMillis(Long.valueOf(refreshTokenExpiresIn)));
 
         // db에 refresh_token 저장하기
 
         return OauthResponse.builder()
-                .nickname(nickname)
+                .nickname(member.getNickname())
                 .access_token(accessToken)
                 .access_token_expires(accessTokenExpiresIn)
                 .refresh_token(refreshToken)
                 .refresh_token_expires(refreshTokenExpiresIn)
-                .email(email)
-                .profile_img(profile)
-                .thumbnail_img(thumbnail)
+                .email(member.getEmail())
+                .profile_img(member.getProfile())
+                .thumbnail_img(member.getThumbnail())
                 .build();
     }
-
-
 }

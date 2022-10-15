@@ -1,6 +1,7 @@
 package com.juno.ounapi.service.kakao;
 
 import com.juno.ounapi.common.httpclient.MyHttpClient;
+import com.juno.ounapi.config.jwt.TokenProvider;
 import com.juno.ounapi.domain.member.Member;
 import com.juno.ounapi.dto.kakao.OauthRequest;
 import com.juno.ounapi.enums.oauth.Oauth;
@@ -23,6 +24,7 @@ import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,6 +49,9 @@ class OauthServiceImplUnitTest {
 
     @Mock
     private ValueOperations valueOperations;
+
+    @Mock
+    private TokenProvider tokenProvider;
 
     @Test
     @DisplayName("회원 조회에 실패한다.")
@@ -109,7 +114,7 @@ class OauthServiceImplUnitTest {
     @DisplayName("회원 조회에 성공한다.")
     void oauthTokenSuccess(){
         // given
-        OauthRequest request = new OauthRequest("access_token", "bearer", "refresh_token", 21599L, "account_email profile_image profile_nickname", 5183999L);
+        OauthRequest request = new OauthRequest("kakao-access-token", "bearer", "kakao-refresh-token", 21599L, "account_email profile_image profile_nickname", 5183999L);
         given(myHttpClient.httpPostRequest(any()))
                 .willReturn(new HttpResponse<String>() {
                     @Override
@@ -155,6 +160,11 @@ class OauthServiceImplUnitTest {
         Member member = new Member(1L, Oauth.KAKAO.name(), "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
         given(memberRepository.findByMemberId(any())).willReturn(Optional.of(member));
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
+
+        given(tokenProvider.createAccessToken(any())).willReturn("access-token");
+        given(tokenProvider.createRefreshToken(any())).willReturn("refresh-token");
+        given(tokenProvider.parserExpiresAt(any())).willReturn(new Date());
+
         doNothing().when(valueOperations).set(anyString(), any(), any());
 
         // when
@@ -169,7 +179,7 @@ class OauthServiceImplUnitTest {
     @DisplayName("회원가입에 성공한다.")
     void oauthJoinSuccess(){
         // given
-        OauthRequest request = new OauthRequest("access_token", "bearer", "refresh_token", 21599L, "account_email profile_image profile_nickname", 5183999L);
+        OauthRequest request = new OauthRequest("kakao-access-token", "bearer", "kakao-refresh-token", 21599L, "account_email profile_image profile_nickname", 5183999L);
         given(myHttpClient.httpPostRequest(any()))
                 .willReturn(new HttpResponse<String>() {
                     @Override
@@ -215,6 +225,10 @@ class OauthServiceImplUnitTest {
         Member member = new Member(1L, Oauth.KAKAO.name(), "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
         given(memberRepository.save(any())).willReturn(member);
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
+        given(tokenProvider.createAccessToken(any())).willReturn("access-token");
+        given(tokenProvider.createRefreshToken(any())).willReturn("refresh-token");
+        given(tokenProvider.parserExpiresAt(any())).willReturn(new Date());
+
         doNothing().when(valueOperations).set(anyString(), any(), any());
 
         // when
@@ -222,6 +236,5 @@ class OauthServiceImplUnitTest {
 
         // then
         assertEquals(member.getEmail(), oauthResponse.getEmail());
-
     }
 }
