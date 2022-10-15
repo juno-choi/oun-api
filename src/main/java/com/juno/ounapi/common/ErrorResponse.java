@@ -1,6 +1,7 @@
 package com.juno.ounapi.common;
 
-import com.juno.ounapi.enums.api.ApiResult;
+import com.juno.ounapi.enums.api.ResultCode;
+import com.juno.ounapi.enums.api.ResultType;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,10 +14,10 @@ public class ErrorResponse {
     private String resultMsg;
     private Error error;
 
-    public ErrorResponse(ApiResult apiResult, Error error) {
-        this.resultCode = apiResult.getResultCode();
-        this.resultType = apiResult.getResultType();
-        this.resultMsg = apiResult.getResultMsg();
+    public ErrorResponse(ResultCode resultCode, ResultType resultType, String resultMsg, Error error) {
+        this.resultCode = resultCode.name();
+        this.resultType = resultType.name();
+        this.resultMsg = resultMsg;
         this.error = error;
     }
 
