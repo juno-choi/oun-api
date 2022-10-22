@@ -37,7 +37,6 @@ public class OauthServiceImpl implements OauthService{
 
     @Override
     public OauthResponse oauthToken(OauthRequest oauthRequest) {
-        log.debug("oauthToken call ...");
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
@@ -77,7 +76,6 @@ public class OauthServiceImpl implements OauthService{
 
     @Override
     public OauthResponse oauthJoin(OauthRequest oauthRequest) {
-        log.debug("oauthJoin call ...");
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
 
