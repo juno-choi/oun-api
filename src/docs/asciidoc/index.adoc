@@ -1,0 +1,27 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+
+= O.un API
+:toc: left
+:toclevels: 4
+:toc-title: O.un api
+
+== 📗 로그인
+
+=== ✍️ Test
+
+📄 REQUEST
+include::{snippets}/test-controller-test/test/http-request.adoc[]
+
+📄 REQUEST FIELD
+
+include::{snippets}/test-controller-test/test/request-fields.adoc[]
+
+📄 RESPONSE
+
+include::{snippets}/test-controller-test/test/http-response.adoc[]
+
+📄 RESPONSE FIELD
+
+include::{snippets}/test-controller-test/test/response-fields.adoc[]
