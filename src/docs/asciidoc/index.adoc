@@ -7,21 +7,21 @@ endif::[]
 :toclevels: 4
 :toc-title: O.un api
 
-== 📗 로그인
+== 📗 kakao 로그인
 
-=== ✍️ Test
+=== ✍️ 회원가입
 
 📄 REQUEST
-include::{snippets}/test-controller-test/test/http-request.adoc[]
+include::{snippets}/oauth-controller-docs-test/join/http-request.adoc[]
 
 📄 REQUEST FIELD
 
-include::{snippets}/test-controller-test/test/request-fields.adoc[]
+include::{snippets}/oauth-controller-docs-test/join/request-fields.adoc[]
 
 📄 RESPONSE
 
-include::{snippets}/test-controller-test/test/http-response.adoc[]
+include::{snippets}/oauth-controller-docs-test/join/http-response.adoc[]
 
 📄 RESPONSE FIELD
 
-include::{snippets}/test-controller-test/test/response-fields.adoc[]
+include::{snippets}/oauth-controller-docs-test/join/response-fields.adoc[]
