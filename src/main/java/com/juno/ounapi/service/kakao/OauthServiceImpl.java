@@ -25,6 +25,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.http.HttpResponse;
 import java.time.Duration;
@@ -32,6 +33,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@Transactional(readOnly = true)
 public class OauthServiceImpl implements OauthService{
     private final MyHttpClient myHttpClient;
     private final MemberRepository memberRepository;
@@ -39,6 +41,7 @@ public class OauthServiceImpl implements OauthService{
     private final TokenProvider tokenProvider;
 
     @Override
+    @Transactional
     public OauthResponse oauthToken(OauthRequest oauthRequest) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
@@ -78,6 +81,7 @@ public class OauthServiceImpl implements OauthService{
     }
 
     @Override
+    @Transactional
     public OauthResponse oauthJoin(OauthRequest oauthRequest) {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
