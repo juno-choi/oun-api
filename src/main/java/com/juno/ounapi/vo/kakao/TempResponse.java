@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class EmptyResponse {
-    private String empty;
+public class TempResponse {
+    private String message;
 }

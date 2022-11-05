@@ -11,16 +11,19 @@ import com.juno.ounapi.domain.member.Member;
 import com.juno.ounapi.dto.kakao.user.KakaoResponse;
 import com.juno.ounapi.dto.kakao.OauthRequest;
 import com.juno.ounapi.dto.token.TokenDto;
-import com.juno.ounapi.enums.api.CommonExceptionCode;
+import com.juno.ounapi.enums.api.ResultCode;
+import com.juno.ounapi.enums.api.ResultType;
+import com.juno.ounapi.enums.api.oauth.OauthFailMsg;
 import com.juno.ounapi.enums.oauth.Oauth;
 import com.juno.ounapi.exception.CommonException;
 import com.juno.ounapi.repository.member.MemberRepository;
-import com.juno.ounapi.vo.kakao.EmptyResponse;
+import com.juno.ounapi.vo.kakao.TempResponse;
 import com.juno.ounapi.vo.kakao.OauthResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.net.http.HttpResponse;
@@ -65,8 +68,8 @@ public class OauthServiceImpl implements OauthService{
 
         // 회원 조회
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
-                () -> new CommonException(CommonExceptionCode.LOGIN_FAIL, Error.builder()
-                        .error(new EmptyResponse())
+                () -> new CommonException(HttpStatus.BAD_REQUEST, ResultCode.BAD_REQUEST, ResultType.ALERT, OauthFailMsg.KAKAO_LOGIN_FAIL.message, Error.builder()
+                        .error(new TempResponse())
                         .build())
         );
 

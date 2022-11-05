@@ -14,17 +14,10 @@ public class ErrorResponse {
     private String resultMsg;
     private Error error;
 
-    public ErrorResponse(ResultCode resultCode, ResultType resultType, String resultMsg, Error error) {
-        this.resultCode = resultCode.name();
-        this.resultType = resultType.name();
-        this.resultMsg = resultMsg;
-        this.error = error;
-    }
-
     @Builder
-    public ErrorResponse(String resultCode, String resultType, String resultMsg, Error error) {
-        this.resultCode = resultCode;
-        this.resultType = resultType;
+    public ErrorResponse(ResultCode resultCode, ResultType resultType, String resultMsg, Error error) {
+        this.resultCode = resultCode.code;
+        this.resultType = resultType.name();
         this.resultMsg = resultMsg;
         this.error = error;
     }
