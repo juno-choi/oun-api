@@ -1,5 +1,6 @@
 package com.juno.ounapi.domain.member;
 
+import com.juno.ounapi.enums.oauth.Oauth;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -19,7 +20,7 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String type;    // kakao, naver, email 등
+    private Oauth type;    // kakao, naver, email 등
     @Column(unique = true, nullable = false)
     private String memberId;    // sns의 경우 회원 번호
     private String email;

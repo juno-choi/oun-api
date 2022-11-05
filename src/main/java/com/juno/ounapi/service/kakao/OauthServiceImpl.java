@@ -113,7 +113,7 @@ public class OauthServiceImpl implements OauthService{
                 .email(email)
                 .memberId(memberId)
                 .nickname(nickname)
-                .type(Oauth.KAKAO.name())
+                .type(Oauth.KAKAO)
                 .profile(profile)
                 .thumbnail(thumbnail)
                 .build());

@@ -4,6 +4,7 @@ import com.juno.ounapi.common.httpclient.MyHttpClient;
 import com.juno.ounapi.config.jwt.TokenProvider;
 import com.juno.ounapi.domain.member.Member;
 import com.juno.ounapi.dto.kakao.OauthRequest;
+import com.juno.ounapi.enums.api.oauth.OauthFailMsg;
 import com.juno.ounapi.enums.oauth.Oauth;
 import com.juno.ounapi.exception.CommonException;
 import com.juno.ounapi.repository.member.MemberRepository;
@@ -106,7 +107,7 @@ class OauthServiceImplUnitTest {
         CommonException ex = assertThrows(CommonException.class, () -> oauthService.oauthToken(request));
 
         // then
-        assertEquals("LOGIN_FAIL", ex.getMessage());
+        assertEquals(OauthFailMsg.KAKAO_LOGIN_FAIL.message, ex.getResultMsg());
     }
 
 
@@ -157,7 +158,7 @@ class OauthServiceImplUnitTest {
                         return HttpClient.Version.HTTP_1_1;
                     }
                 });
-        Member member = new Member(1L, Oauth.KAKAO.name(), "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
+        Member member = new Member(1L, Oauth.KAKAO, "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
         given(memberRepository.findByMemberId(any())).willReturn(Optional.of(member));
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
 
@@ -222,7 +223,7 @@ class OauthServiceImplUnitTest {
                         return HttpClient.Version.HTTP_1_1;
                     }
                 });
-        Member member = new Member(1L, Oauth.KAKAO.name(), "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
+        Member member = new Member(1L, Oauth.KAKAO, "123456", "ililil9482@naver.com", null, "최준호", null, null, "profile image", "thumbnail image", LocalDateTime.now(), LocalDateTime.now());
         given(memberRepository.save(any())).willReturn(member);
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
         given(tokenProvider.createAccessToken(any())).willReturn("access-token");
