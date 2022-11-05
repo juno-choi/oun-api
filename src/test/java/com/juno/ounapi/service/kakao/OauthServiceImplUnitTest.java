@@ -1,9 +1,15 @@
 package com.juno.ounapi.service.kakao;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.juno.ounapi.common.httpclient.MyHttpClient;
 import com.juno.ounapi.config.jwt.TokenProvider;
+import com.juno.ounapi.config.mapper.MyObjectMapper;
 import com.juno.ounapi.domain.member.Member;
 import com.juno.ounapi.dto.kakao.OauthRequest;
+import com.juno.ounapi.dto.kakao.user.KakaoAccount;
+import com.juno.ounapi.dto.kakao.user.KakaoResponse;
+import com.juno.ounapi.dto.kakao.user.Profile;
+import com.juno.ounapi.dto.kakao.user.Properties;
 import com.juno.ounapi.enums.api.oauth.OauthFailMsg;
 import com.juno.ounapi.enums.oauth.Oauth;
 import com.juno.ounapi.exception.CommonException;
@@ -54,9 +60,12 @@ class OauthServiceImplUnitTest {
     @Mock
     private TokenProvider tokenProvider;
 
+    @Mock
+    private MyObjectMapper objectMapper;
+
     @Test
     @DisplayName("회원 조회에 실패한다.")
-    void oauthTokenFail1(){
+    void oauthTokenFail1() throws JsonProcessingException {
         // given
         OauthRequest request = new OauthRequest("access_token", "bearer", "refresh_token", 21599L, "account_email profile_image profile_nickname", 5183999L);
         given(myHttpClient.httpPostRequest(any()))
@@ -102,7 +111,7 @@ class OauthServiceImplUnitTest {
             }
         });
         given(memberRepository.findByMemberId(any())).willReturn(Optional.empty());
-
+        given(objectMapper.readValue(anyString(), (Class<Object>) any())).willReturn(new KakaoResponse(1L, null, new Properties("tester", "", ""), new KakaoAccount(null, null, new Profile("","thumnail-url", "image-url", "default-image-url"), null, null, null, null, "test@mail.com")));
         // when
         CommonException ex = assertThrows(CommonException.class, () -> oauthService.oauthToken(request));
 
@@ -113,7 +122,7 @@ class OauthServiceImplUnitTest {
 
     @Test
     @DisplayName("회원 조회에 성공한다.")
-    void oauthTokenSuccess(){
+    void oauthTokenSuccess() throws JsonProcessingException {
         // given
         OauthRequest request = new OauthRequest("kakao-access-token", "bearer", "kakao-refresh-token", 21599L, "account_email profile_image profile_nickname", 5183999L);
         given(myHttpClient.httpPostRequest(any()))
@@ -165,7 +174,7 @@ class OauthServiceImplUnitTest {
         given(tokenProvider.createAccessToken(any())).willReturn("access-token");
         given(tokenProvider.createRefreshToken(any())).willReturn("refresh-token");
         given(tokenProvider.parserExpiresAt(any())).willReturn(new Date());
-
+        given(objectMapper.readValue(anyString(), (Class<Object>) any())).willReturn(new KakaoResponse(1L, null, new Properties("tester", "", ""), new KakaoAccount(null, null, new Profile("","thumnail-url", "image-url", "default-image-url"), null, null, null, null, "test@mail.com")));
         doNothing().when(valueOperations).set(anyString(), any(), any());
 
         // when
@@ -178,7 +187,7 @@ class OauthServiceImplUnitTest {
 
     @Test
     @DisplayName("회원가입에 성공한다.")
-    void oauthJoinSuccess(){
+    void oauthJoinSuccess() throws JsonProcessingException {
         // given
         OauthRequest request = new OauthRequest("kakao-access-token", "bearer", "kakao-refresh-token", 21599L, "account_email profile_image profile_nickname", 5183999L);
         given(myHttpClient.httpPostRequest(any()))
@@ -229,6 +238,8 @@ class OauthServiceImplUnitTest {
         given(tokenProvider.createAccessToken(any())).willReturn("access-token");
         given(tokenProvider.createRefreshToken(any())).willReturn("refresh-token");
         given(tokenProvider.parserExpiresAt(any())).willReturn(new Date());
+
+        given(objectMapper.readValue(anyString(), (Class<Object>) any())).willReturn(new KakaoResponse(1L, null, new Properties("tester", "", ""), new KakaoAccount(null, null, new Profile("","thumnail-url", "image-url", "default-image-url"), null, null, null, null, "test@mail.com")));
 
         doNothing().when(valueOperations).set(anyString(), any(), any());
 

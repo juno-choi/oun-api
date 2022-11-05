@@ -1,12 +1,11 @@
 package com.juno.ounapi.service.kakao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.juno.ounapi.common.Error;
 import com.juno.ounapi.common.httpclient.MyHttpClient;
 import com.juno.ounapi.common.httpclient.vo.PostRequest;
 import com.juno.ounapi.config.jwt.TokenProvider;
+import com.juno.ounapi.config.mapper.MyObjectMapper;
 import com.juno.ounapi.domain.member.Member;
 import com.juno.ounapi.dto.kakao.user.KakaoResponse;
 import com.juno.ounapi.dto.kakao.OauthRequest;
@@ -39,13 +38,11 @@ public class OauthServiceImpl implements OauthService{
     private final MemberRepository memberRepository;
     private final RedisTemplate<String, Object> redisTemplate;
     private final TokenProvider tokenProvider;
+    private final MyObjectMapper objectMapper;
 
     @Override
     @Transactional
     public OauthResponse oauthToken(OauthRequest oauthRequest) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-
         KakaoResponse kakaoResponse = null;
         String kakaoAccessToken = oauthRequest.getAccess_token();
         String kakaoRefreshToken = oauthRequest.getRefresh_token();
@@ -83,9 +80,6 @@ public class OauthServiceImpl implements OauthService{
     @Override
     @Transactional
     public OauthResponse oauthJoin(OauthRequest oauthRequest) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-
         KakaoResponse kakaoResponse = null;
         String kakaoAccessToken = oauthRequest.getAccess_token();
         String kakaoRefreshToken = oauthRequest.getRefresh_token();
