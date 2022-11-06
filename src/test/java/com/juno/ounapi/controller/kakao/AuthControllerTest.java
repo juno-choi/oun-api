@@ -42,8 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(MockitoExtension.class)
 @Execution(ExecutionMode.SAME_THREAD)
-@Transactional(readOnly = true)
-public class OauthControllerTest extends RestdocsTestSupport {
+public class AuthControllerTest extends RestdocsTestSupport {
     @MockBean
     private MyHttpClient myHttpClient;
 
@@ -101,7 +100,7 @@ public class OauthControllerTest extends RestdocsTestSupport {
                 });
         //when
         ResultActions perform = mockMvc.perform(
-                post(PREFIX_URL+"/oauth").contentType(MediaType.APPLICATION_JSON)
+                post(PREFIX_URL+ "/auth").contentType(MediaType.APPLICATION_JSON)
                         .content(convertToString(request))
         );
 

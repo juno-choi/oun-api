@@ -1,0 +1,47 @@
+ifndef::snippets[]
+:snippets: ./build/generated-snippets
+endif::[]
+:toc: left
+:toclevels: 4
+:toc-title: O.un api
+:doctype: book
+:source-highlighter: highlightjs
+:sectlinks:
+
+[[kakao-member]]
+
+= 📗 kakao 로그인
+
+== 📄 회원가입
+
+=== ✅ REQUEST
+include::{snippets}/auth-controller-docs-test/join/http-request.adoc[]
+
+=== ✅ REQUEST FIELD
+
+include::{snippets}/auth-controller-docs-test/join/request-fields.adoc[]
+
+=== ✅ RESPONSE
+
+include::{snippets}/auth-controller-docs-test/join/http-response.adoc[]
+
+=== ✅ RESPONSE FIELD
+
+include::{snippets}/auth-controller-docs-test/join/response-fields.adoc[]
+
+== 📄 로그인
+
+=== ✅ REQUEST
+include::{snippets}/auth-controller-docs-test/auth/http-request.adoc[]
+
+=== ✅ REQUEST FIELD
+
+include::{snippets}/auth-controller-docs-test/auth/request-fields.adoc[]
+
+=== ✅ RESPONSE
+
+include::{snippets}/auth-controller-docs-test/auth/http-response.adoc[]
+
+=== ✅ RESPONSE FIELD
+
+include::{snippets}/auth-controller-docs-test/auth/response-fields.adoc[]

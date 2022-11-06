@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/v1/kakao")
 @Slf4j
 @RequiredArgsConstructor
-public class OauthController {
+public class AuthController {
     private final OauthService oauthService;
 
-    @PostMapping("/oauth")
+    @PostMapping("/auth")
     public ResponseEntity<ApiResponse<?>> login(@RequestBody OauthRequest oauthRequest){
         return ResponseEntity.ok(
                 ApiResponse.builder()
