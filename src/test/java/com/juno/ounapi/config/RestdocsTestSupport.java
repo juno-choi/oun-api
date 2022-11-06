@@ -1,6 +1,5 @@
-package com.juno.ounapi.controller;
+package com.juno.ounapi.config;
 
-import com.juno.ounapi.config.RestdocsConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.extension.ExtendWith;

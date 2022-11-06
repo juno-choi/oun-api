@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class ErrorResponse {
+public class ErrorResponse<T>{
     private String resultCode;
     private String resultType;
     private String resultMsg;
-    private Error error;
+    private T error;
 
     @Builder
-    public ErrorResponse(ResultCode resultCode, ResultType resultType, String resultMsg, Error error) {
+    public ErrorResponse(ResultCode resultCode, ResultType resultType, String resultMsg, T error) {
         this.resultCode = resultCode.code;
         this.resultType = resultType.name();
         this.resultMsg = resultMsg;

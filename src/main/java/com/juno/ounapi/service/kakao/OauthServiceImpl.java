@@ -1,7 +1,8 @@
 package com.juno.ounapi.service.kakao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.juno.ounapi.common.Error;
+import com.juno.ounapi.common.ErrorResponse;
+import com.juno.ounapi.common.error.Error;
 import com.juno.ounapi.common.httpclient.MyHttpClient;
 import com.juno.ounapi.common.httpclient.vo.PostRequest;
 import com.juno.ounapi.config.jwt.TokenProvider;
@@ -16,7 +17,7 @@ import com.juno.ounapi.enums.api.oauth.OauthFailMsg;
 import com.juno.ounapi.enums.oauth.Oauth;
 import com.juno.ounapi.exception.CommonException;
 import com.juno.ounapi.repository.member.MemberRepository;
-import com.juno.ounapi.vo.kakao.TempResponse;
+import com.juno.ounapi.common.error.TempResponse;
 import com.juno.ounapi.vo.kakao.OauthResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -68,9 +70,7 @@ public class OauthServiceImpl implements OauthService{
 
         // 회원 조회
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
-                () -> new CommonException(HttpStatus.BAD_REQUEST, ResultCode.BAD_REQUEST, ResultType.ALERT, OauthFailMsg.KAKAO_LOGIN_FAIL.message, Error.builder()
-                        .error(new TempResponse())
-                        .build())
+                () -> new CommonException(HttpStatus.BAD_REQUEST, ResultCode.BAD_REQUEST, ResultType.ALERT, OauthFailMsg.KAKAO_LOGIN_FAIL.message)
         );
 
         // token 생성
@@ -99,8 +99,15 @@ public class OauthServiceImpl implements OauthService{
             kakaoResponse = objectMapper.readValue(response.body(), KakaoResponse.class);
         } catch (JsonProcessingException e) {
             log.error("json parser error",e);
+            throw new RuntimeException(e);
         }
+
         memberId = kakaoResponse.getId().toString();
+        // 회원 조회
+        Optional<Member> findMember = memberRepository.findByMemberId(memberId);
+        if(findMember.isPresent()) throw new CommonException(HttpStatus.BAD_REQUEST, ResultCode.BAD_REQUEST, ResultType.ALERT, OauthFailMsg.KAKAO_DUPLICATION_JOIN_FAIL.message);
+
+
         String email = kakaoResponse.getKakao_account().getEmail();
         String nickname = kakaoResponse.getProperties().getNickname();
         String profile = kakaoResponse.getKakao_account().getProfile().getProfile_image_url();

@@ -1,4 +1,4 @@
-package com.juno.ounapi.controller;
+package com.juno.ounapi.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,7 +14,7 @@ public abstract class ControllerTest {
     @Autowired
     protected MockMvc mockMvc;
 
-    protected String convertString(Object dto) throws JsonProcessingException {
+    protected String convertToString(Object dto) throws JsonProcessingException {
         return objectMapper.writeValueAsString(dto);
     }
 }

@@ -1,7 +1,7 @@
 package com.juno.ounapi.controller.kakao;
 
 import com.juno.ounapi.common.httpclient.MyHttpClient;
-import com.juno.ounapi.controller.RestdocsTestSupport;
+import com.juno.ounapi.config.RestdocsTestSupport;
 import com.juno.ounapi.dto.kakao.OauthRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,6 @@ import java.net.URI;
 import java.net.http.*;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -89,7 +88,7 @@ class OauthControllerDocsTest extends RestdocsTestSupport {
         // when
         ResultActions perform = mockMvc.perform(post("/v1/kakao/join")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(convertString(request)));
+                .content(convertToString(request)));
         // then
         perform.andDo(docs.document(
                 requestFields(
