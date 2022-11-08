@@ -8,6 +8,7 @@ public enum ResultCode {
     INTERNAL_SERVER("9999"),
     FAIL("0500"),
     BAD_REQUEST("0400"),
+    UN_AUTHORIZED("0401"),
     LOGIN_FAIL("0403"),
     ;
     public String code;

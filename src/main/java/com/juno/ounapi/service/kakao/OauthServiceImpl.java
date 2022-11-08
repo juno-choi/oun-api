@@ -70,7 +70,7 @@ public class OauthServiceImpl implements OauthService{
 
         // 회원 조회
         Member member = memberRepository.findByMemberId(memberId).orElseThrow(
-                () -> new CommonException(HttpStatus.BAD_REQUEST, ResultCode.BAD_REQUEST, ResultType.ALERT, OauthFailMsg.KAKAO_LOGIN_FAIL.message)
+                () -> new CommonException(HttpStatus.UNAUTHORIZED, ResultCode.UN_AUTHORIZED, ResultType.ALERT, OauthFailMsg.KAKAO_LOGIN_FAIL.message)
         );
 
         // token 생성
@@ -150,6 +150,8 @@ public class OauthServiceImpl implements OauthService{
         // redis에 사용자 토큰 등록하기
         String memberSeq = String.valueOf(member.getId());
         ValueOperations<String, Object> redis = redisTemplate.opsForValue();
+        log.debug("expires = {}",accessTokenExpiresIn);
+        log.debug("expires ms = {}",Duration.ofMillis(Long.valueOf(accessTokenExpiresIn)).toMinutes());
         redis.set(accessToken, memberSeq, Duration.ofMillis(Long.valueOf(accessTokenExpiresIn)));
         redis.set(refreshToken, memberSeq, Duration.ofMillis(Long.valueOf(refreshTokenExpiresIn)));
 
